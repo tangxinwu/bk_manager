@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>爱夫卡运维后端管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/static/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+	<link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/plugin.css">
+    <link rel="stylesheet" href="/static/css/landing.css">
+    <link rel="stylesheet" href="/static/css/jquery-ui.css">
+
+
+  <!--[if lt IE 9]>
+    <script src="/static/js/ie/respond.min.js"></script>
+    <script src="/static/js/ie/html5.js"></script>
+  <![endif]-->
+
+</head>
+<body>
+  <!-- header -->
+	<header id="header" class="navbar bg bg-black">
+    <ul class="nav navbar-nav navbar-avatar pull-right">
+      <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">            
+          <span class="hidden-sm-only">{{ logged_user }}</span>
+          <span class="thumb-small avatar inline"><img src="/static/images/avatar.jpg" alt="{{ logged_user }}" class="img-circle"></span>
+          <b class="caret hidden-sm-only"></b>
+        </a>
+        <ul class="dropdown-menu">
+          <li><a href="/logout/">登出</a></li>
+        </ul>
+      </li>
+    </ul>
+    <a class="navbar-brand" href="#"><img src="/static/images/fcar_log.png"></a>
+    <button type="button" class="btn btn-link pull-left nav-toggle hidden-lg" data-toggle="class:slide-nav slide-nav-left" data-target="body">
+      <i class="icon-reorder icon-xlarge text-default"></i>
+    </button>
+	</header>
+  <!-- / header -->
+  <!-- nav -->
+  <nav id="nav" class="nav-primary visible-lg nav-vertical">
+    <ul class="nav" data-spy="affix" data-offset-top="50">
+        <li><a href="/index/"><i class="icon-dashboard icon-xlarge"></i>端口监控</a></li>
+        <li><a href="/install_service/"><i class="icon-cloud-upload icon-xlarge"></i>服务安装</a></li>
+        <li><a href="/data_gui/"><i class="icon-off icon-xlarge"></i>数据统计</a></li>
+        <li><a href="/ip_interface/"><i class="icon-calendar icon-xlarge"></i>ip管理界面</a></li>
+        <li class="active"><a href="/GenExcelFile/"><i class="icon-building icon-xlarge"></i>自助修改界面</a></li>
+        <li><a href="/docker_service/"><i class="icon-trello icon-xlarge"></i>docker服务列表</a></li>
+        <li><a href="/vote/"><i class="icon-bar-chart icon-xlarge"></i>投票界面</a></li>
+        <li><a href="/test_environment/"><i class="icon-level-up icon-xlarge"></i>测试环境功能</a></li>
+
+    </ul>
+  </nav>
+  <!-- / nav -->
+  <section id="content">
+    <section class="main padder">
+        <div class="col-sm-6" style="margin: 20px auto">
+            <section class="panel">
+                <header class="panel-heading">excel导出</header>
+               <select class="form-control" id='excel_type'>
+                      <option value='f7shuanji'>f7s换机表</option>
+                      <option value='f6shuanji'>f6s换机表</option>
+                      <option value='wenkong'>文控表</option>
+                      <option value='wenkong_zhuanjia'>文控(专家版)</option>
+                      <option value='banbenfabu_list'>版本发布列表</option>
+                      <option value='carlist'>车型表</option>
+                </select>
+                <input type='button' class='btn btn-info' style="margin: 10px auto;left: 45%" value='导出' onclick="window.location.href='/GenExcelFile?type_name=' + $('#excel_type').val()">
+
+            </section>
+
+
+        </div>
+        <div class="col-sm-6" style="margin: 20px auto;" id="export_by_time">
+            <section class="panel" style=" height: 168px">
+                 <header class="panel-heading">版本发布列表</header>
+                 <div class="col-sm-6">
+                     <input type="text" id="datepicker" class="form-control" placeholder="选择起始时间">
+                 </div>
+                <div class="col-sm-6">
+                    <input type="text" id="datepicker2" class="form-control" placeholder="选择结束时间" >
+
+                </div>
+                <div class="col-lg-6">
+                     <input type="button" value="导出" class="btn btn-info" style="margin: 4% 95% auto;">
+                </div>
+
+
+            </section>
+
+
+        </div>
+        <div class="col-sm-6" style="margin: 20px auto;" id="change_type">
+            <section class="panel" style=" height: 168px">
+                 <header class="panel-heading">自助修改售机类型</header>
+                <div class="col-lg-6">
+                    <label class="col-sm-12">changetype@fcar.com</label>
+                    <label class="col-sm-12">szfcar88</label>
+                     <input type="button" value="前往" class="btn btn-info" style="margin: 4% 95% auto;" onclick="window.location.href='http://192.168.3.216:10088/change_type/'">
+                </div>
+
+
+            </section>
+
+
+        </div>
+        <div class="col-sm-6" style="margin: 20px auto;" id="change_expecter">
+            <section class="panel" style=" height: 168px">
+                 <header class="panel-heading">自助修改专家版</header>
+                <div class="col-lg-6">
+                    <label class="col-sm-12">changepro</label>
+                    <label class="col-sm-12">szfcar.8</label>
+                     <input type="button" value="前往" class="btn btn-info" style="margin: 4% 95% auto;" onclick="window.location.href='http://yun1.szfcar.com/change_login/'">
+                </div>
+
+
+            </section>
+
+
+        </div>
+        <div class="col-sm-6" style="margin: 20px auto;" id="lock_szd">
+            <section class="panel" style=" height: 168px">
+                 <header class="panel-heading">上止点锁机界面</header>
+                <div class="col-lg-6">
+                    <label class="col-sm-12">szd</label>
+                    <label class="col-sm-12">12345678</label>
+                     <input type="button" value="前往" class="btn btn-info" style="margin: 4% 95% auto;" onclick="window.location.href='http://yun1.szfcar.com/change_login/'">
+                </div>
+            </section>
+
+
+        </div>
+         <div class="col-sm-6" style="margin: 20px auto;" id="lock_szd">
+            <section class="panel" style=" height: 168px">
+                 <header class="panel-heading">vcenter管理界面</header>
+                 <label class="col-sm-12">绝密</label>
+                <label class="col-sm-12">绝密</label>
+                <div class="col-lg-6">
+                     <input type="button" value="前往" class="btn btn-info" style="margin: 4% 95% auto;" onclick="window.location.href='http://192.168.3.229'">
+                </div>
+            </section>
+
+
+        </div>
+         <div class="col-sm-6" style="margin: 20px auto;" id="lock_szd">
+            <section class="panel" style=" height: 168px">
+                 <header class="panel-heading">zabbix管理界面</header>
+                 <label class="col-sm-12">admin</label>
+                <label class="col-sm-12">zabbix</label>
+                <div class="col-lg-6">
+                     <input type="button" value="前往" class="btn btn-info" style="margin: 4% 95% auto;" onclick="window.location.href='http://192.168.3.216:8084/zabbix/'">
+                </div>
+            </section>
+
+
+        </div>
+    </section>
+  </section>
+  <!-- footer -->
+{#  <footer id="footer">#}
+{#    <div class="text-center padder clearfix">#}
+{#      <p>#}
+{#        <small>&copy; 2017 NTS：<a href="http://www.szfcar.com/" target="_blank">深圳爱夫卡科技股份有限公司</a></small><br><br>#}
+{#      </p>#}
+{#    </div>#}
+{#  </footer>#}
+{#  <a href="#" class="hide slide-nav-block" data-toggle="class:slide-nav slide-nav-left" data-target="body"></a>#}
+  <!-- / footer -->
+    <script src="/static/js/jquery.min.js"></script>
+    <script src="/static/js/jquery-ui.js"></script>
+    <script type="text/javascript">
+        //日期选择器
+        $(function() {
+            $("#datepicker").datepicker({dateFormat: 'yy-mm-dd'});
+            $("#datepicker2").datepicker({dateFormat: 'yy-mm-dd'});
+        });
+    </script>
+  <!--自定义js-->
+  <script src="/static/js/myjs_export.js"></script>
+  <!-- Bootstrap -->
+  <script src="/static/js/bootstrap.js"></script>
+  <!-- app -->
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/app.plugin.js"></script>
+  <script src="/static/js/app.data.js"></script>
+
+  <!-- Sparkline Chart -->
+  <script src="/static/js/charts/sparkline/jquery.sparkline.min.js"></script>  
+  <!-- Easy Pie Chart -->
+  <script src="/static/js/charts/easypiechart/jquery.easy-pie-chart.js"></script>
+  <script src="/static/js/ie/excanvas.js"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="/static/css/bootstrap.css">
+        <script src="/static/vote_static/js/jquery-3.2.1.min.js"></script>
+        <script src="/static/js/bootstrap.js"></script>
+        <style>
+         .covered {
+            height: 2000px;
+            width: 100%;
+            z-index: 99;
+            background-color: black;
+            opacity: 0.5;
+             position: fixed;
+         }
+
+        .col-sm-6 .form-control {
+            width: 56%;
+            margin: 5% 0 5% 5%;
+        }
+        </style>
+        <script>
+            $(function () {
+                $("#sn_submit").off("click").on("click", function () {
+                    var active_type = {
+                        0: "不能注册",
+                        1: "不允许激活",
+                        2: "次数激活",
+                        3: "永久激活",
+                    };
+                var sn = $("#sn").val();
+                if (sn.trim(" ") == ""){
+                    alert("序列号不能为空！");
+                    return false;
+                }
+                $("#sn_submit").attr("value", "获取中...");
+                $("#sn_submit").attr("disabled",true);
+                $.post("/change_type/",{"sn_query": sn}, function (result) {
+
+                   if (result == "样机下没有此序列号!"){
+                       //返回错误信息
+                       alert(result);
+                       $("#sn_submit").attr("value", "搜索");
+                       $("#sn_submit").attr("disabled", false);
+                   }else {
+                       $(".covered").hide();
+                       $("#show_sn").val(sn);
+                       //获取现在序列号的信息放到默认位置
+                       var real_result = JSON.parse(result);
+                       var default_lang = real_result["sn"][1];
+                       var default_downclass = real_result["sn"][0];
+                       var default_activetype = real_result["sn"][2];
+                       var default_actives = real_result["sn"][3];
+                       //设置默认值
+                       $("#show_lang").prepend("<option value='" + default_lang + "'>" + real_result["lang"][default_lang] +"</option>");
+                       $("#show_downclass").prepend("<option value='" + default_downclass + "'>" + real_result["downclass"][default_downclass] +"</option>");
+                       $("#show_activetype").prepend("<option value='" + default_activetype + "'>" + active_type[default_activetype] +"</option>");
+                       $("#show_actives").val(default_actives);
+                       //写入全部售机类型和语言类型
+                       $.each(real_result["lang"], function (k,v) {
+                           $("#show_lang").append("<option value='" + k + "'>" + v +"</option>");
+                       });
+                       $.each(real_result["downclass"], function (k,v) {
+                            $("#show_downclass").append("<option value='" + k + "'>" + v +"</option>");
+                       });
+                       $.each(active_type, function (k,v) {
+                           $("#show_activetype").append("<option value='" + k + "'>" + v +"</option>");
+                       });
+
+                    $("#sn_submit").attr("value", "搜索");
+                    $("#sn_submit").attr("disabled", false);
+                   }
+               }) ;
+            })
+            });
+
+            $(function () {
+               $(".col-sm-4 button").off("click").on("click", function () {
+                   var sn = $("#show_sn").val();
+                   var lang = $("#show_lang").val();
+                   var downclass = $("#show_downclass").val();
+                   var activetype = $("#show_activetype").val();
+                   var actives = $("#show_actives").val();
+                   $.post("/change_type/", {"sn": sn, "lang":lang,"downclass": downclass, "activetype":activetype, "actives":actives},function (result) {
+                      alert(result);
+                   });
+               });
+            });
+
+        </script>
+    </head>
+    <body>
+        <!--遮罩层-->
+        <div class="covered">
+            <input type="text" class="form-control" style="width: 30%;margin:15% 0 0 30%" placeholder="请输入SN号进行查询" id="sn" maxlength="16">
+            <input type="button" value="搜索"  class="btn btn-info" style="margin: 2% 0 0 43%;color: black" id="sn_submit">
+        </div>
+        <!--遮罩层结束-->
+        <form class="form-inline">
+            <div class="col-sm-6">
+                <div class="form-group">
+                     <label for="show_trader">经销商</label>
+                    <input type="text" class="form-control" id="show_trader" value="样机" placeholder="经销商" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="show_sn">序列号</label>
+                    <input type="text" class="form-control disabled" id="show_sn" placeholder="序列号" disabled>
+                </div>
+                <div class="form-group">
+                    <label for="show_activetype">激活类型</label>
+                    <select class="form-control" id="show_activetype"></select>
+                </div>
+            </div>
+        <div class="col-sm-6">
+            <div class="form-group">
+                <label for="show_lang">语言</label>
+                <select class="form-control" id="show_lang"></select>
+            </div>
+            <div class="form-group">
+                <label for="show_downclass">售机类型</label>
+                <select class="form-control" id="show_downclass"></select>
+            </div>
+            <div class="form-group">
+                <label for="show_actives">激活次数</label>
+                <input type="number" class="form-control" placeholder="激活次数" size="2" id="show_actives">
+            </div>
+
+        </div>
+        <div class="col-sm-4">
+            <div class="form-group">
+                <button class="btn btn-info" style="margin-left: 129%">提交修改</button>
+            </div>
+
+        </div>
+     </form>
+
+    </body>
+
+</html>
