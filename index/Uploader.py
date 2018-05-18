@@ -46,7 +46,7 @@ class Uploader(ABC):
         if not self._file_name_check():
             return False
         if not os.path.isdir(self.local_path):
-            os.system("""mkdir -p %s""".format(self.local_path))
+            os.system("""mkdir -p {}""".format(self.local_path))
         self.local_file = os.path.join(self.local_path, self.file_name)
         with open(self.local_file, "wb") as f:
             try:
