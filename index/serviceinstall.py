@@ -136,8 +136,9 @@ class InstallServiceJar(InstallService):
         restart_cmd = """wget http://192.168.3.216:8081/scripts/service_control/service_jar_control.sh -O /tmp/service_jar_control.sh \
                          && sh /tmp/service_jar_control.sh"""
         stdin, stdout, stderror = self._connect.exec_command(restart_cmd)
-        if stderror.read():
-            return "jar服务重启失败"
+        flag = stderror.read()
+        if flag:
+            return flag.decode("utf8")
         return "jar服务已经重启"
 
 
@@ -162,8 +163,9 @@ class InstallServiceWar(InstallService):
                          -O /tmp/service_tomcat_control.sh && sh /tmp/service_tomcat_control.sh kill && \
                          sh /tmp/service_tomcat_control.sh restart """
         stdin, stdout, stderror = self._connect.exec_command(restart_cmd)
-        if stderror.read():
-            return "tomcat启动失败"
+        flag = stderror.read()
+        if flag:
+            return flag.decode("utf8")
         return "tomcat 已经重启"
 
 
@@ -188,8 +190,9 @@ class InstallServiceSql(InstallService):
         change_cmd = """sed -i "s/\'fcsp_account_db\'/fcsp_account_db/g" /tmp/fcsp_account_db.sql && \
                      mysql -uroot -p123456 fcsp_account_db -e 'source /tmp/fcsp_account_db.sql' """
         stdin, stdout, stderror = self._connect.exec_command(change_cmd)
-        if stderror.read():
-            return "数据库更新错误"
+        flag = stderror.read()
+        if flag:
+            return flag.decode("utf8")
         return "sql替换完成"
 
 
