@@ -70,3 +70,11 @@ class MonitorService_admin(admin.ModelAdmin):
 
 
 admin.site.register(MonitorService, MonitorService_admin)
+
+
+class SnapshotTask_admin(admin.ModelAdmin):
+    list_display = ["applicationIp", "interval", "week_day", "snap_date", "timing_unit"]
+    search_fields = ["applicationIp"]
+
+
+admin.site.register(SnapshotTask, SnapshotTask_admin)

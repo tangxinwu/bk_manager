@@ -5,12 +5,40 @@
 from abc import ABC, abstractmethod
 import os
 import socket
+import paramiko
+try:
+    import serviceinstall
+except ImportError:
+    from index import serviceinstall
 
 
 class Service(ABC):
     """
     操作服务的抽象类接口
     """
+    def __init__(self, host, username, password):
+        """
+        实例化的参数
+        :param host: 主机名
+        :param username: 用户名
+        :param password: 密码
+        """
+        self.host = host
+        self.username = username
+        self.password = password
+        self._connect = ""
+        self._init_sshclient()
+
+    def _init_sshclient(self):
+        """
+        初始化ssh链接
+        :return:
+        """
+        s1 = paramiko.SSHClient()
+        s1.load_system_host_keys()
+        s1.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        s1.connect(hostname=self.host, username=self.username, password=self.password, port=22, timeout=10)
+        self._connect = s1
 
     @abstractmethod
     def start(self):
@@ -80,6 +108,32 @@ class TomcatService(Service):
         except ConnectionRefusedError:
             return 0
         return 1
+
+
+class SnapshotService(Service):
+    def __init__(self, host, username, password):
+        """
+        引用父类的初始化方法
+        """
+        super().__init__(host, username, password)
+
+    def status(self):
+        status_cmd = """ps -ef | grep Daemon_server | grep -v grep"""
+        stdin, stdout, stderror = self._connect.exec_command(status_cmd)
+        flag = stdout.read()
+        print(flag)
+        if flag:
+            return "Running"
+        return "Exited"
+
+    def start(self):
+        pass
+
+    def stop(self):
+        pass
+
+
+
 
 
 

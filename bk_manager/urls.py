@@ -38,4 +38,6 @@ urlpatterns = [
     url(r"^server_type_count/$", views.server_type_count),  # 获取虚拟机和物理机的数据
     url(r"^os_count/$", views.os_count),  # 获取虚拟机和物理机的数据
     url(r"^test_environment/", views.test_environment),  # 测试环境功能
+    url(r"^timer_snapshot/", views.timer_snapshot),  # 虚拟机定时快照
+    url(r"^snapshot_status/$", views.snapshot_status),  # 后台创建snapshot的守护进程
 ]

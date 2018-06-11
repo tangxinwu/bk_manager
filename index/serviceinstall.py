@@ -161,11 +161,8 @@ class InstallServiceWar(InstallService):
         """
         restart_cmd = """wget http://192.168.3.216:8081/scripts/service_control/service_tomcat_control.sh \
                          -O /tmp/service_tomcat_control.sh && sh /tmp/service_tomcat_control.sh kill && \
-                         sh /tmp/service_tomcat_control.sh restart """
+                         sh /tmp/service_tomcat_control.sh start """
         stdin, stdout, stderror = self._connect.exec_command(restart_cmd)
-        flag = stderror.read()
-        if flag:
-            return flag.decode("utf8")
         return "tomcat 已经重启"
 
 

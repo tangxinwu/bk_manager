@@ -14,6 +14,8 @@ import pymysql as MySQLdb
 from abc import abstractmethod, ABC
 import paramiko
 import re
+import index.create_snapshot_txw
+
 
 MySQLdb.install_as_MySQLdb()
 # Create your views here.
@@ -476,9 +478,9 @@ def make_to_excel(request):
     :param request:
     :return:
     """
-    login_check = LogCheck(request)()
-    if not login_check:
-        return HttpResponseRedirect("/login/")
+    # login_check = LogCheck(request)()
+    # if not login_check:
+    #     return HttpResponseRedirect("/login/")
     type = request.GET.get('type_name', '')
     start_time = request.GET.get('start_time', '')
     end_time = request.GET.get('end_time', '')
@@ -773,3 +775,44 @@ def soft_list(request):
     """
     pass
 
+
+@csrf_exempt
+def timer_snapshot(request):
+    """
+    定时创建vmware虚拟机快照
+    :param request:
+    :return:
+    """
+    task_list = SnapshotTask.objects.all()
+    all_vm_list = IpInterface.objects.filter(hardware_type__hardware_type="虚拟机")
+    if request.POST:
+        ip = request.POST.get("ip", "")
+        interval = (lambda x: 0 if not x else int(x))(request.POST.get("interval", ""))
+        timing_unit = request.POST.get("timing_unit", "")
+        week_day = request.POST.get("week_day", "")
+        snap_date = (lambda x: x if not x else x.split("T")[1])(request.POST.get("detail_time", ""))
+        try:
+            if ip:
+                SnapshotTask.objects.update_or_create(applicationIp=ip,
+                                                      defaults={"interval": interval, \
+                                                                "timing_unit": timing_unit, \
+                                                                "week_day": week_day,\
+                                                                "snap_date": snap_date})
+            return HttpResponse("变更成功")
+        except:
+            return HttpResponse("变更失败！")
+    return render(request, "timer_snapshot.html", locals())
+
+
+@csrf_exempt
+def snapshot_status(request):
+    """
+    检测后台控制定时的后台进程Daemon_server是否存在
+    :param request:
+    :return:
+    """
+    if request.POST:
+        p = services.SnapshotService("127.0.0.1", "tang", "sakamotomaaya1")
+
+        return HttpResponse(p.status())
+    return HttpResponse("no input")

@@ -138,13 +138,33 @@ class MonitorService(models.Model):
     """
     MonitorIP = models.ForeignKey("IpInterface", on_delete=models.CASCADE)
     port = models.CharField("监控端口", max_length=20)
-    service_name = models.CharField("监控的服务名",max_length=200)
+    service_name = models.CharField("监控的服务名", max_length=200)
 
     class Meta:
         ordering = ["-service_name"]
         verbose_name_plural = "监控的服务"
 
     def __str__(self):
-        return str(self.MonitorIP) + "--" +  self.service_name
+        return str(self.MonitorIP) + "--" + self.service_name
+
+
+class SnapshotTask(models.Model):
+    """
+    保存创建的VM虚拟机定时快照设置
+    注意具体任务的时间是用的charfield不是用的datatimefield
+    """
+
+    applicationIp = models.GenericIPAddressField("对应的虚拟机的ip")
+    interval = models.IntegerField("间隔时间每x", blank=True, null=True)
+    week_day = models.CharField("在每个星期几", max_length=10, blank=True, null=True)
+    snap_date = models.CharField("在每个具体任务的时间", max_length=10, blank=True, null=True)
+    timing_unit = models.CharField("计时单位", max_length=10, blank=True, null=True)
+
+    class Meta:
+        ordering = ["-applicationIp"]
+        verbose_name_plural = "定时的快照"
+
+    def __str__(self):
+        return str(self.applicationIp)
 
 
