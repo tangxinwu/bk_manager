@@ -100,15 +100,15 @@
    </div>
       <div class="row" style="margin-top: 2%;margin-left: 1%">
              <div class="row text-small">
-              <div class="col-lg-4">
+              <div class="col-lg-3">
                 <div class="input-group">
-                  <input type="text" class="input-big form-control" placeholder="查找">
+                  <input type="text" class="input-big form-control" placeholder="查找" id="filter_content">
                   <span class="input-group-btn">
-                    <button class="btn btn-big btn-white" type="button">查找</button>
+                    <button class="btn btn-big btn-white" type="button" id="filter_ip">查找</button>
                   </span>
                 </div>
               </div>
-              <div class="col-lg-4">
+              <div class="col-lg-3">
                 <div class="input-group">
                   <select id="new_snapshot_ip" class="form-control">
                       {% for vm in all_vm_list %}
@@ -120,12 +120,24 @@
                   </span>
                 </div>
               </div>
-              <div class="col-lg-4">
+              <div class="col-lg-3">
                 <div class="input-group">
-                  <span style="font-size: 17px">快照服务状态</span>
+                  <span >快照服务状态</span>
                   <span class="input-group-btn" >
-                    <img id="alert_status"  style="width: 72px;height: 50px;float:left;margin-right: 220px">
+                    <img id="alert_status"  style="width: 72px;height: 50px;margin-right: 100px">
                   </span>
+                </div>
+              </div>
+              <div class="col-lg-3" >
+                <div class="input-group">
+                    <span>进程操作:</span>
+                    <select class="form-control" style="width: 40%" id="sent_singal">
+                        <option value="">空</option>
+                        <option value="restart">重启</option>
+                        <option value="stop">停止</option>
+                        <option value="start">启动</option>
+                    </select>
+                    <input class="form-control" type="button" style="width: 30%" value="提交" id="process_submit">
                 </div>
               </div>
             </div>

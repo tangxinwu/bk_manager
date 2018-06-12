@@ -42,7 +42,7 @@ $("#save").off("click").on("click",function () {
 //后台snapshot控制的进程的状态
 
 $(function () {
-   $.post("/snapshot_status/", {"action":"action"}, function (result) {
+   $.post("/snapshot_status/", {"action":"status"}, function (result) {
       if (result == "Exited"){
           $("#alert_status").attr("src","/static/images/red-alert.gif");
 
@@ -50,4 +50,33 @@ $(function () {
           $("#alert_status").attr("src","/static/images/green-alert.gif");
       }
    });
+   $("#process_submit").off("click").on("click", function () {
+      var action = $("#sent_singal").val();
+      $.post("/snapshot_status/", {"action":action}, function (result) {
+         alert(result);
+         if (result == "Stared failed!" || result == "Daemon stopped!" || result == "Daemon not running!"){
+             $("#alert_status").attr("src","/static/images/red-alert.gif");
+         }else {
+             $("#alert_status").attr("src","/static/images/green-alert.gif");
+         }
+      });
+   });
 });
+
+
+//search 查找js
+
+$("#filter_ip").off("click").on("click", function () {
+    var tr_objects = $("tbody tr");
+    var filter_content = $("#filter_content").val();
+
+    $.each(tr_objects, function (k,v) {
+        var children_content =$(this).children();
+        if (children_content[1].innerText.indexOf(filter_content) != -1){
+            $(this).show();
+        }else {
+            $(this).hide();
+        }
+    })
+});
+

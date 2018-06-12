@@ -326,7 +326,7 @@ class DownClassDetail(SSHInit):
         设置查询所有downclass的查询语句
         :return:
         """
-        self._cmd = """mysql -uroot -pfcar.8 www -e "SELECT id,name FROM www_tbdownclass \G" """
+        self._cmd = """mysql -uroot -pfcar.8 www -e "SELECT id,name FROM www_tbdownclass ORDER BY name\G" """
 
     def _process_result(self):
         """
@@ -812,7 +812,10 @@ def snapshot_status(request):
     :return:
     """
     if request.POST:
+        action = request.POST.get("action")
         p = services.SnapshotService("127.0.0.1", "tang", "sakamotomaaya1")
-
-        return HttpResponse(p.status())
+        try:
+            return HttpResponse(getattr(p, action)())
+        except AttributeError:
+            return HttpResponse("POST ERROR")
     return HttpResponse("no input")

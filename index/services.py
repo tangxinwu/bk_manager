@@ -60,7 +60,6 @@ class Service(ABC):
         :return:
         """
         self.stop()
-        self.start()
         return self.start()
 
     @abstractmethod
@@ -114,6 +113,9 @@ class SnapshotService(Service):
     def __init__(self, host, username, password):
         """
         引用父类的初始化方法
+        :param host ip
+        :param username 用户名
+        :param password 密码
         """
         super().__init__(host, username, password)
 
@@ -121,16 +123,36 @@ class SnapshotService(Service):
         status_cmd = """ps -ef | grep Daemon_server | grep -v grep"""
         stdin, stdout, stderror = self._connect.exec_command(status_cmd)
         flag = stdout.read()
-        print(flag)
         if flag:
             return "Running"
         return "Exited"
 
     def start(self):
-        pass
+        """
+        启动快照后台进程
+        :return:
+        """
+        if self.status() != "Running":
+            # 此处可修改脚本的位置
+            # script_path = r"/bk_manager/index/Daemon_server.py"
+            script_path = r"/home/tang/Desktop/old_backup/bk_manager/index/Daemon_server.py"
+            start_cmd = "python3 {}".format(script_path)
+            stdin, stdout, stderror = self._connect.exec_command(start_cmd)
+            if stderror.read():
+                return "Stared failed!"
+            else:
+                return "Started successfully!"
+        return "Already running!"
 
     def stop(self):
-        pass
+        if self.status() == "Running":
+            daemon_pid_cmd = """ps -ef | grep Daemon | grep -v grep | awk -F ' ' '{print $2}'"""
+            stdin, stdout, stderror = self._connect.exec_command(daemon_pid_cmd)
+            daemon_pid = stdout.read().decode("utf8")
+            stdin, stdout, stderror = self._connect.exec_command("kill -9 {}".format(daemon_pid))
+            return "Daemon stopped!"
+        return "Daemon not running!"
+
 
 
 

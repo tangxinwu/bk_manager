@@ -8,6 +8,7 @@ import time
 import datetime
 import threading
 import schedule
+import daemon
 
 
 try:
@@ -120,12 +121,12 @@ def timer_task():
 
     while True:
         schedule.run_pending()
-        time.sleep(1)g
-
+        time.sleep(1)
 
 
 if __name__ == "__main__":
-    timer_task()
+    with daemon.DaemonContext():
+        timer_task()
 
 
 
