@@ -17,6 +17,7 @@ except ImportError:
     import create_snapshot_txw as CSST
 
 
+
 class MakeSnapshotThreading:
     """
     把创建快照的方法 封装成一个可调用的类
@@ -85,13 +86,14 @@ class MakeSnapshotMethod:
                 return getattr(getattr(getattr(schedule, "every")(), self._week_day), "do")
             if not self._week_day and self._snap_date:
                 return getattr(getattr(getattr(getattr(schedule, "every")(), "day"), "at")(self._snap_date), "do")
-        return "Error"
+        return "error"
 
 
 def timer_task():
     """
     定时任务函数,收集所有定时任务
     :var schedule_list:保存由类MakeThreading创建实例，用于定时任务(schedule)的调用,因为不能传参数
+    :var task_list: 保存接受完参数的创建snapshot的类
     :var connection: 保存sqlite3 连接
     :var cur: 指针游标
     :var data: 数据库中查到的所有定时任务
@@ -117,7 +119,11 @@ def timer_task():
         params = dict()
 
     for threading_task in zip(task_list, schedule_list):
-        threading_task[0].make_process()(threading_task[1])
+        try:
+            threading_task[0].make_process()(threading_task[1])
+        except TypeError:
+            print("{} maybe not configurte yet!".format(threading_task[1].ip))
+            continue
 
     while True:
         schedule.run_pending()

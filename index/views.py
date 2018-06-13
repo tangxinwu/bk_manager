@@ -783,6 +783,9 @@ def timer_snapshot(request):
     :param request:
     :return:
     """
+    login_check = LogCheck(request)()
+    if not login_check:
+        return HttpResponseRedirect("/login/")
     task_list = SnapshotTask.objects.all()
     all_vm_list = IpInterface.objects.filter(hardware_type__hardware_type="虚拟机")
     if request.POST:
@@ -808,7 +811,8 @@ def timer_snapshot(request):
 def snapshot_status(request):
     """
     检测后台控制定时的后台进程Daemon_server是否存在
-    :param request:
+    post 快照的创建，修改和状态查询
+    get 快照的新增的ip
     :return:
     """
     if request.POST:
@@ -818,4 +822,11 @@ def snapshot_status(request):
             return HttpResponse(getattr(p, action)())
         except AttributeError:
             return HttpResponse("POST ERROR")
+    if request.GET:
+        new_snapshot_ip = request.GET.get("new_snapshot_ip", "")
+        if SnapshotTask.objects.filter(applicationIp=new_snapshot_ip):
+            return HttpResponse("Snapshot is existed!")
+        else:
+            SnapshotTask.objects.create(applicationIp=new_snapshot_ip)
+            return HttpResponse("Snapshot is added!")
     return HttpResponse("no input")

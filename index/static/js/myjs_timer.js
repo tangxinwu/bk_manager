@@ -77,6 +77,17 @@ $("#filter_ip").off("click").on("click", function () {
         }else {
             $(this).hide();
         }
-    })
+    });
 });
 
+//添加新的snapshot ip
+
+$("#new_snapshot_submit").off("click").on("click", function () {
+    var new_snapshot_ip = $("#new_snapshot_ip").val();
+    $.get("/snapshot_status" , {"new_snapshot_ip" : new_snapshot_ip} , function (result) {
+       alert(result);
+       if (result == "Snapshot is added!"){
+           location.reload();
+       }
+    });
+});
