@@ -39,22 +39,20 @@ zoom_option = {"dataZoom": [
 ]}
 
 
-def need_login():
+def need_login(func):
     """
     验证需要登陆的装饰器
     :return:
     """
-    def _wapper(func):
-        def _wapper1(request):
-            print(request)
-            print(func)
-            print(request.session.get("logged_user", ""))
-            if not request.session.get("logged_user", ""):
-                return HttpResponseRedirect("/login/")
-            else:
-                return func(request)
-        return _wapper1
-    return _wapper
+    def _wapper1(request):
+        print(request)
+        print(func)
+        print(request.session.get("logged_user", ""))
+        if not request.session.get("logged_user", ""):
+            return HttpResponseRedirect("/login/")
+        else:
+            return func(request)
+    return _wapper1
 
 
 class GenData:
@@ -131,7 +129,7 @@ def get_vote_data(request):
 
 
 @csrf_exempt
-@need_login()
+@need_login
 def index(request):
     """
     加载主页面的views
@@ -142,7 +140,7 @@ def index(request):
 
 
 @csrf_exempt
-@need_login()
+@need_login
 def install_service(request):
     """
     安装服务的界面
@@ -169,6 +167,7 @@ def install_service(request):
 
 
 @csrf_exempt
+@need_login
 def data_gui(request):
     """
     获取数据页面的views
@@ -187,7 +186,7 @@ def data_gui(request):
 
 
 @csrf_exempt
-@need_login()
+@need_login
 def service_status(request):
     """
     查看后台服务的状态，对服务进行操作
@@ -208,7 +207,7 @@ def service_status(request):
     return render(request, "service_status.html", locals())
 
 
-@need_login()
+@need_login
 def ip_interface(request):
     """
     ip管理界面
@@ -506,8 +505,8 @@ def make_to_excel(request):
     return render(request, "GenExcelFile.html", locals())
 
 
+@need_login
 @csrf_exempt
-@need_login()
 def docker_service(request):
     """
     检测docker以及其集群上有的服务
@@ -560,8 +559,8 @@ def docker_service(request):
     return render(request, "docker_service.html", locals())
 
 
+@need_login
 @csrf_exempt
-@need_login()
 def vote(request):
     """
     投票界面
@@ -574,6 +573,7 @@ def vote(request):
     return render(request, "vote.html", locals())
 
 
+@need_login
 @csrf_exempt
 def vote_action(request):
     """
@@ -749,8 +749,8 @@ def soft_list(request):
     pass
 
 
+@need_login
 @csrf_exempt
-@need_login()
 def timer_snapshot(request):
     """
     定时创建vmware虚拟机快照
@@ -804,6 +804,8 @@ def snapshot_status(request):
     return HttpResponse("no input")
 
 
-@need_login()
+
+
+@need_login
 def test(request):
     return HttpResponse("hello world!")
