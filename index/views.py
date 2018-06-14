@@ -14,7 +14,6 @@ import pymysql as MySQLdb
 from abc import abstractmethod, ABC
 import paramiko
 import re
-import index.create_snapshot_txw
 
 
 MySQLdb.install_as_MySQLdb()
@@ -40,36 +39,22 @@ zoom_option = {"dataZoom": [
 ]}
 
 
-class LogCheck:
+def need_login():
     """
-    登陆验证
+    验证需要登陆的装饰器
+    :return:
     """
-    def __init__(self, request):
-        self.request = request
-
-    def _check_session(self):
-        """
-        检查session
-        :return:
-        """
-        if not self.request.session.get("logged_user", ""):
-            self._delete_session()
-            return False
-        else:
-            return True
-
-    def _delete_session(self):
-        """
-        删除session
-        :return:
-        """
-        try:
-            del self.request.session["logged_user"]
-        except KeyError:
-            pass
-
-    def __call__(self, *args, **kwargs):
-        return self._check_session()
+    def _wapper(func):
+        def _wapper1(request):
+            print(request)
+            print(func)
+            print(request.session.get("logged_user", ""))
+            if not request.session.get("logged_user", ""):
+                return HttpResponseRedirect("/login/")
+            else:
+                return func(request)
+        return _wapper1
+    return _wapper
 
 
 class GenData:
@@ -146,26 +131,22 @@ def get_vote_data(request):
 
 
 @csrf_exempt
+@need_login()
 def index(request):
     """
     加载主页面的views
     :param request:
     :return:
     """
-    login_check = LogCheck(request)()
-    if not login_check:
-        return HttpResponseRedirect("/login/")
     return HttpResponseRedirect("/service_status/")
 
 
 @csrf_exempt
+@need_login()
 def install_service(request):
     """
     安装服务的界面
     """
-    login_check = LogCheck(request)()
-    if not login_check:
-        return HttpResponseRedirect("/login/")
     valid_ips = IpInterface.objects.all()
     logged_user = request.session.get("logged_user")
     if request.POST:
@@ -206,15 +187,13 @@ def data_gui(request):
 
 
 @csrf_exempt
+@need_login()
 def service_status(request):
     """
     查看后台服务的状态，对服务进行操作
     :param request:
     :return:
     """
-    login_check = LogCheck(request)()
-    if not login_check:
-        return HttpResponseRedirect("/login/")
     if request.POST:
         all_service_info = eval(request.POST.get("all_service_info", ""))
         port_status = []
@@ -229,15 +208,13 @@ def service_status(request):
     return render(request, "service_status.html", locals())
 
 
+@need_login()
 def ip_interface(request):
     """
     ip管理界面
     :param request:
     :return:
     """
-    login_check = LogCheck(request)()
-    if not login_check:
-        return HttpResponseRedirect("/login/")
     all_normal_ip = IpInterface.objects.filter(especily=0).order_by("ipaddr")
     all_especily_ip = IpInterface.objects.filter(especily=1).order_by("ipaddr")
     logged_user = request.session.get("logged_user")
@@ -530,15 +507,13 @@ def make_to_excel(request):
 
 
 @csrf_exempt
+@need_login()
 def docker_service(request):
     """
     检测docker以及其集群上有的服务
     :param request:
     :return:
     """
-    login_check = LogCheck(request)()
-    if not login_check:
-        return HttpResponseRedirect("/login/")
     if request.POST:
         flag = request.POST.get("action", "")
         if flag == "refresh_service":
@@ -586,15 +561,13 @@ def docker_service(request):
 
 
 @csrf_exempt
+@need_login()
 def vote(request):
     """
     投票界面
     :param request:
     :return:
     """
-    login_check = LogCheck(request)()
-    if not login_check:
-        return HttpResponseRedirect("/login/")
     all_option = VoteOption.objects.all()
     all_department = Department.objects.all()
     logged_user = request.session.get("logged_user")
@@ -777,15 +750,14 @@ def soft_list(request):
 
 
 @csrf_exempt
+@need_login()
 def timer_snapshot(request):
     """
     定时创建vmware虚拟机快照
     :param request:
     :return:
     """
-    login_check = LogCheck(request)()
-    if not login_check:
-        return HttpResponseRedirect("/login/")
+    logged_user = request.session.get("logged_user")
     task_list = SnapshotTask.objects.all()
     all_vm_list = IpInterface.objects.filter(hardware_type__hardware_type="虚拟机")
     if request.POST:
@@ -830,3 +802,8 @@ def snapshot_status(request):
             SnapshotTask.objects.create(applicationIp=new_snapshot_ip)
             return HttpResponse("Snapshot is added!")
     return HttpResponse("no input")
+
+
+@need_login()
+def test(request):
+    return HttpResponse("hello world!")
